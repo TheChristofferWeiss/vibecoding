@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Database } from '@/lib/database.types'
+
+type Profile = Database['public']['Tables']['profiles']['Row']
+type ProfileSelect = Pick<Profile, 'full_name' | 'role'>
+
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -13,9 +19,9 @@ export default async function DashboardPage() {
   // Get user profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('full_name, role')
     .eq('id', user.id)
-    .single()
+    .single<ProfileSelect>()
 
   return (
     <main className="min-h-screen p-8">
@@ -67,4 +73,3 @@ export default async function DashboardPage() {
     </main>
   )
 }
-
